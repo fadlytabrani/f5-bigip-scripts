@@ -21,7 +21,7 @@ qkview_url = 'https://ihealth2-api.f5.com/qkview-analyzer/api/qkviews'
 upload_url = qkview_url + '?visible_in_gui=true'
 
 qkview_file = datetime.now().strftime('%Y%m%d-%H%M') + '.qkview'
-apitokens_file = os.path.join(os.path.abspath(__file__, 'ihealth.apitokens'))
+apitokens_file = os.path.join(os.path.abspath(__file__), 'ihealth.apitokens')
 access_token = ''
 
 with open(apitokens_file, 'r') as _f:
