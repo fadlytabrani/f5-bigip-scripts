@@ -10,7 +10,6 @@ It reads api credentials from a file named ihealth.apitokens in its current path
 Each credential is a line in the format [client_id]:[client_secret].
 """
 
-import logging
 import os
 import requests
 import subprocess
@@ -22,15 +21,14 @@ qkview_url = 'https://ihealth2-api.f5.com/qkview-analyzer/api/qkviews'
 upload_url = qkview_url + '?visible_in_gui=true'
 
 qkview_file = datetime.now().strftime('%Y%m%d-%H%M') + '.qkview'
-
 apitokens_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'ihealth.apitokens')
 access_token = ''
 
+# Get the api_keys from file.
 with open(apitokens_file, 'r') as _f:
-
-    # Read the apitokens file from the bottom up.
     api_keys = _f.read().split()
 
+# Read the apitokens file from the bottom up.
 for api_key in reversed(api_keys):
 
     # Extract the client id and secret, get access token.
@@ -44,34 +42,20 @@ for api_key in reversed(api_keys):
         access_token = response.json()['access_token']
         break
 
-# Exit immediately if no valid keys are found.
-if not access_token:
-    logging.critical('No valid keys found, might be expired.')
-    exit(1)
-
-# Test access to the API before proceeding.
+# Test access to the API before proceeding
 response = requests.get(qkview_url,
                         headers={'Authorization': 'Bearer ' + access_token})
 if response.status_code != 200:
-    logging.error('iHealth test failed, site might be down.')
     exit(1)
 
 cmd = ['nice', '-n', '19', 'qkview', '-f', qkview_file]
 
-# Exit immediately with error code if qkview creation failed.
-return_code = subprocess.call(cmd)
-if return_code != 0:
-    logging.critical('QKVIEW file could not be created.')
-    exit(return_code)
+# Exit immediately with error code 1 if qkview creation failed.
+if subprocess.call(cmd) != 0:
+    exit(1)
 
-# The qkview file will be created in /var/tmp. Use curl to upload it to iHealth.
 cmd = ['curl', '--location', upload_url, '--header', 'Authorization: Bearer ' + access_token,
        '--form', 'qkview=@"' + '/var/tmp/' + qkview_file + '"']
 
 # Exit with curl return code.
-return_code = subprocess.call(cmd)
-if return_code != 0:
-    logging.critical("QKVIEW file %s upload failed." % (qkview_file))
-    exit(return_code)
-else:
-    logging.info("QKVIEW file %s upload successful." % (qkview_file))
+exit(subprocess.call(cmd))
