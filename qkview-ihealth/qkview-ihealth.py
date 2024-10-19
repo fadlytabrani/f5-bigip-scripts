@@ -154,7 +154,7 @@ def upload_qkview(url, file_path, access_token):
     
     try:
         output = subprocess.check_output(cmd, stderr=subprocess.STDOUT)  # Execute the curl command
-        logging.info("Qkview file uploaded successfully: {}".format(output))
+        logging.info("Qkview file uploaded successfully")
     except subprocess.CalledProcessError as e:
         logging.error("Error uploading qkview file: {}".format(e.output))
         raise
