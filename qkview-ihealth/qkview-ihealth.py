@@ -31,10 +31,11 @@ def create_qkview(file_name):
     Raises:
         subprocess.CalledProcessError: If the qkview command fails.
     """
+    logging.info('Creating qkview file: {}.'.format(file_name))
     cmd = ['nice', '-n', '19', 'qkview', '-f', file_name]  # Run the command with low priority
     try:
         output = subprocess.check_output(cmd, stderr=subprocess.STDOUT)
-        logging.info("Qkview file '%s' created successfully.", file_name)
+        logging.info("Qkview file created successfully.")
         logging.debug("Command output: %s", output.decode('utf-8'))
         return os.path.join('/var/tmp', file_name)
     except subprocess.CalledProcessError as e:
@@ -102,10 +103,9 @@ def get_access_token_from_list(token_url, apikeys):
         try:
             access_token = get_access_token(token_url, client_id, client_secret)
             if access_token:
-                logging.info('Obtained access token.')
                 return access_token
-        except Exception as e:
-            logging.warning("API key {0}/{1} failed: {2}".format(i + 1, len(apikeys), e))
+        except:
+            pass
 
     raise Exception('Unable to obtain a valid access token')
 
@@ -145,6 +145,7 @@ def upload_qkview(url, file_path, access_token):
     Raises:
         subprocess.CalledProcessError: If the curl command fails.
     """
+    logging.info('Uploading qkview file.')
     cmd = [
         'curl', '--location', url,
         '--header', 'Authorization: Bearer {}'.format(access_token),
