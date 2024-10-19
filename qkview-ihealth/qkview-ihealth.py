@@ -96,9 +96,9 @@ def get_access_token_from_list(token_url, apikeys):
     """
     logging.info('Obtaining access token from API keys.')
     
-    for i, apikey in reversed(list(enumerate(apikeys))):
+    for i, apikey in enumerate(reversed(apikeys)):
         client_id, client_secret = apikey.split(':')
-        logging.info("Trying API key {0}/{1}".format(i, len(apikeys)))
+        logging.info("Trying API key {0}/{1}".format(i + 1, len(apikeys)))
         
         try:
             access_token = get_access_token(token_url, client_id, client_secret)
